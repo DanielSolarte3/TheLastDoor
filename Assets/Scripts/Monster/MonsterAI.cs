@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections;  // Para las corrutinas
+using System.Collections;
+using UnityEngine.SceneManagement;  // Para las corrutinas
 
 public class MonsterAI : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class MonsterAI : MonoBehaviour
     public Transform playerTarget;  // Asignar desde Inspector
     public Animator monsterAnimator; // Asignar desde Inspector
 
-    [Header("Configuración")]
+    [Header("Configuraciï¿½n")]
     public float attackRange = 3f;
     public float rotationSpeed = 5f;
 
@@ -19,10 +20,10 @@ public class MonsterAI : MonoBehaviour
 
     void Start()
     {
-        // 1. Obtener referencias automáticas
+        // 1. Obtener referencias automï¿½ticas
         agent = GetComponent<NavMeshAgent>();
 
-        // 2. Validaciones críticas
+        // 2. Validaciones crï¿½ticas
         if (monsterAnimator == null)
             monsterAnimator = GetComponent<Animator>();
 
@@ -39,16 +40,17 @@ public class MonsterAI : MonoBehaviour
         {
             agent.SetDestination(playerTarget.position);
 
-            // 4. Control de animación de caminar
+            // 4. Control de animaciï¿½n de caminar
             bool isMoving = agent.velocity.magnitude > 0.1f;
             monsterAnimator.SetBool("IsWalking", isMoving);
         }
 
-        // 5. Lógica de ataque
+        // 5. Lï¿½gica de ataque
         float distanceToPlayer = Vector3.Distance(transform.position, playerTarget.position);
         if (distanceToPlayer <= attackRange && !isAttacking)
         {
             StartCoroutine(AttackPlayer());
+            
         }
     }
 
@@ -74,26 +76,30 @@ public class MonsterAI : MonoBehaviour
             yield return null;
         }
 
-        // 8. Disparar animación de ataque
+        // 8. Disparar animaciï¿½n de ataque
         monsterAnimator.SetTrigger("Attack");
 
-        // 9. Esperar a que termine el ataque (ajustar según duración de animación)
+        // 9. Esperar a que termine el ataque (ajustar segï¿½n duraciï¿½n de animaciï¿½n)
         yield return new WaitForSeconds(1.2f);
-
+        
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("EndMenu");
         // 10. Reanudar movimiento
-        agent.isStopped = false;
-        isAttacking = false;
+        //agent.isStopped = false;
+        //isAttacking = false;
     }
 
-    // 11. Llamado desde evento de animación (en el frame de impacto)
+    // 11. Llamado desde evento de animaciï¿½n (en el frame de impacto)
     public void OnAttackHitEvent()
     {
         if (playerTarget != null &&
             Vector3.Distance(transform.position, playerTarget.position) <= attackRange * 1.2f)
         {
-            Debug.Log("¡Jugador eliminado!");
+            Debug.Log("ï¿½Jugador eliminado!");
 
-            // Llamar al método Die en lugar de desactivar
+            // Llamar al mï¿½todo Die en lugar de desactivar
             PlayerController playerController = playerTarget.GetComponent<PlayerController>();
             if (playerController != null)
             {
